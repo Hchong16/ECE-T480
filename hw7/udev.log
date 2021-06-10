@@ -1,0 +1,24 @@
+monitor will print the received events for:
+UDEV - the event which udev sends out after rule processing
+KERNEL - the kernel uevent
+
+KERNEL[3068.867692] add      /kernel/fakedrive/device0 (fakedrive)
+KERNEL[3068.867745] add      /kernel/fakedrive/device1 (fakedrive)
+KERNEL[3068.867758] add      /kernel/fakedrive/device2 (fakedrive)
+KERNEL[3068.867769] add      /kernel/fakedrive/device3 (fakedrive)
+KERNEL[3068.867779] add      /module/kobject (module)
+UDEV  [3068.869947] add      /kernel/fakedrive/device0 (fakedrive)
+UDEV  [3068.870942] add      /kernel/fakedrive/device3 (fakedrive)
+UDEV  [3068.871147] add      /kernel/fakedrive/device1 (fakedrive)
+UDEV  [3068.872021] add      /module/kobject (module)
+UDEV  [3068.873933] add      /kernel/fakedrive/device2 (fakedrive)
+KERNEL[3379.187881] remove   /kernel/fakedrive/device0 (fakedrive)
+KERNEL[3379.188266] remove   /kernel/fakedrive/device1 (fakedrive)
+KERNEL[3379.188633] remove   /kernel/fakedrive/device2 (fakedrive)
+KERNEL[3379.188657] remove   /kernel/fakedrive/device3 (fakedrive)
+KERNEL[3379.188669] remove   /module/kobject (module)
+UDEV  [3379.191021] remove   /kernel/fakedrive/device0 (fakedrive)
+UDEV  [3379.191071] remove   /kernel/fakedrive/device1 (fakedrive)
+UDEV  [3379.191093] remove   /kernel/fakedrive/device2 (fakedrive)
+UDEV  [3379.191118] remove   /kernel/fakedrive/device3 (fakedrive)
+UDEV  [3379.191315] remove   /module/kobject (module)

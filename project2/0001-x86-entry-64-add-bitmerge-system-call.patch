@@ -1,0 +1,86 @@
+From 108b7d6c306f9c40de9e11e1e78ca10cdafd0ea3 Mon Sep 17 00:00:00 2001
+From: Harry Chong <hjc39@drexel.edu>
+Date: Tue, 11 May 2021 15:02:22 -0400
+Subject: [PATCH] x86/entry/64: add bitmerge system call
+
+Implemented custom system call to perform bit merging.
+The system call number is 442 under the alias sys_bitmerge.
+The syscall will take in two inputs: 32-bit representing
+the high bits and 32-bit representing the low bits. If
+successful, the output from the syscall will be a 64-bit
+merged value of the inputs. If the most significant bit
+is set to 1, return an error.
+
+Signed-off-by: Harry Chong <hjc39@drexel.edu>
+---
+ arch/x86/entry/syscalls/syscall_64.tbl |  1 +
+ include/linux/syscalls.h               |  2 +-
+ kernel/sys.c                           | 20 ++++++++++++++++++++
+ 3 files changed, 22 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/entry/syscalls/syscall_64.tbl b/arch/x86/entry/syscalls/syscall_64.tbl
+index 78672124d28b..39ab7873de98 100644
+--- a/arch/x86/entry/syscalls/syscall_64.tbl
++++ b/arch/x86/entry/syscalls/syscall_64.tbl
+@@ -363,6 +363,7 @@
+ 439	common	faccessat2		sys_faccessat2
+ 440	common	process_madvise		sys_process_madvise
+ 441	common	epoll_pwait2		sys_epoll_pwait2
++442	common	bitmerge		sys_bitmerge
+ 
+ #
+ # Due to a historical design error, certain syscalls are numbered differently
+diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
+index 7688bc983de5..2d0db045bcce 100644
+--- a/include/linux/syscalls.h
++++ b/include/linux/syscalls.h
+@@ -511,6 +511,7 @@ asmlinkage long sys_preadv(unsigned long fd, const struct iovec __user *vec,
+ 			   unsigned long vlen, unsigned long pos_l, unsigned long pos_h);
+ asmlinkage long sys_pwritev(unsigned long fd, const struct iovec __user *vec,
+ 			    unsigned long vlen, unsigned long pos_l, unsigned long pos_h);
++asmlinkage long long sys_bitmerge(long low_bits, long high_bits);
+ 
+ /* fs/sendfile.c */
+ asmlinkage long sys_sendfile64(int out_fd, int in_fd,
+@@ -1251,7 +1252,6 @@ asmlinkage long sys_mmap_pgoff(unsigned long addr, unsigned long len,
+ 			unsigned long fd, unsigned long pgoff);
+ asmlinkage long sys_old_mmap(struct mmap_arg_struct __user *arg);
+ 
+-
+ /*
+  * Not a real system call, but a placeholder for syscalls which are
+  * not implemented -- see kernel/sys_ni.c
+diff --git a/kernel/sys.c b/kernel/sys.c
+index 51f00fe20e4d..cfab19f0ff54 100644
+--- a/kernel/sys.c
++++ b/kernel/sys.c
+@@ -1676,6 +1676,26 @@ SYSCALL_DEFINE2(setrlimit, unsigned int, resource, struct rlimit __user *, rlim)
+ 	return do_prlimit(current, resource, &new_rlim, NULL);
+ }
+ 
++SYSCALL_DEFINE2(bitmerge, long, low_bits, long, high_bits)
++{
++	long long merged;
++	int msb;
++
++	// Check MSB from high_bits
++	msb = high_bits >> 31;
++	pr_info("MSB = %d\n", msb);
++
++	if (msb == 0) {
++		merged = (long long) high_bits << 32 | low_bits;
++		pr_info("Merged Value = %lld\n", merged);
++
++		return merged;
++	}
++
++	pr_info("MSB is set. Invalid value was passed!\n");
++	return -EINVAL;
++}
++
+ /*
+  * It would make sense to put struct rusage in the task_struct,
+  * except that would make the task_struct be *really big*.  After
+-- 
+2.25.1
+
